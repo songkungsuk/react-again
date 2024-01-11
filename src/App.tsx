@@ -4,6 +4,7 @@ import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { Middle } from './components/Middle';
 import { Create } from './components/Create';
+import { Update } from './components/Update';
 
 function App() {
   const [topics, setTopics] = useState([
@@ -17,6 +18,8 @@ function App() {
   const [nextId, setNextId] = useState(4);
 
   let content = null;
+  let contextControl = null;
+
   if (mode === 'WELCOME') {
     content = <Footer title={'Welcome'} body={'Hello React'} />
   } else if (mode === 'READ') {
@@ -28,6 +31,10 @@ function App() {
       }
     }
     content = <Footer title={title} body={body} />
+    contextControl = <li><a href={'/update' + id} onClick={(event) => {
+      event.preventDefault();
+      setMode('UPDATE');
+    }}>Update</a></li>
   } else if (mode === 'CREATE') {
     content = <Create onCreate={(title: string, body: string) => {
       const newTopic = {
@@ -38,9 +45,21 @@ function App() {
       const newTopics = [...topics];
       newTopics.push(newTopic);
       setTopics(newTopics);
-      let nextId2 = nextId
+      let nextId2 = nextId;
       setNextId(nextId2++);
+      setMode('READ');
     }} ></Create>
+  } else if (mode === 'UPDATE') {
+    let title, body  = null;
+    for (let i = 0; i < topics.length; i++) {
+      if (topics[i].id === id) {
+        title = topics[i].title;
+        body = topics[i].body;
+      }
+    }
+    content = <Update title={title} body={body} onUpdate={(title: any, body: any) => {
+
+    }}></Update>
   }
 
 
@@ -55,10 +74,14 @@ function App() {
         setId(_id);
       }} />
       {content}
-      <a href='/create' onClick={(event) => {
-        event.preventDefault();
-        setMode('CREATE');
-      }}>create</a>
+      <ul>
+        <li>
+          <a href='/create' onClick={(event) => {
+            event.preventDefault();
+            setMode('CREATE');
+          }}>create</a></li>
+        {contextControl}
+      </ul>
     </div>
   );
 }
